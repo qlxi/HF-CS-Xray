@@ -44,7 +44,7 @@ if ! python3 -c "import requests" &> /dev/null; then
     pip3 install requests
 fi
 
-PROJECT_DIR=".sys_dir"
+PROJECT_DIR="python-xray-argo"
 if [ ! -d "$PROJECT_DIR" ]; then
     echo -e "${BLUE}Downloading full repository...${NC}"
     if command -v git &> /dev/null; then
