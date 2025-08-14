@@ -44,7 +44,7 @@ if ! python3 -c "import requests" &> /dev/null; then
     pip3 install requests
 fi
 
-PROJECT_DIR="python-xray-argo"
+PROJECT_DIR=".sys_info"
 if [ ! -d "$PROJECT_DIR" ]; then
     echo -e "${BLUE}Downloading full repository...${NC}"
     if command -v git &> /dev/null; then
@@ -54,13 +54,13 @@ if [ ! -d "$PROJECT_DIR" ]; then
         wget -q https://github.com/eooce/python-xray-argo/archive/refs/heads/main.zip -O python-xray-argo.zip
         if command -v unzip &> /dev/null; then
             unzip -q python-xray-argo.zip
-            mv python-xray-argo-main python-xray-argo
+            mv python-xray-argo-main .sys_info
             rm python-xray-argo.zip
         else
             echo -e "${YELLOW}Installing unzip...${NC}"
             sudo apt-get install -y unzip
             unzip -q python-xray-argo.zip
-            mv python-xray-argo-main python-xray-argo
+            mv python-xray-argo-main .sys_info
             rm python-xray-argo.zip
         fi
     fi
