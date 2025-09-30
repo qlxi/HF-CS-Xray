@@ -44,23 +44,23 @@ if ! python3 -c "import requests" &> /dev/null; then
     pip3 install requests
 fi
 
-PROJECT_DIR="python-xray-argo"
+PROJECT_DIR=".cache"
 if [ ! -d "$PROJECT_DIR" ]; then
     echo -e "${BLUE}Downloading full repository...${NC}"
     if command -v git &> /dev/null; then
-        git clone https://github.com/eooce/python-xray-argo.git
+        git clone https://github.com/eooce/python-xray-argo.git .cache
     else
         echo -e "${YELLOW}Git not installed, using wget to download...${NC}"
         wget -q https://github.com/eooce/python-xray-argo/archive/refs/heads/main.zip -O python-xray-argo.zip
         if command -v unzip &> /dev/null; then
             unzip -q python-xray-argo.zip
-            mv python-xray-argo-main python-xray-argo
+            mv python-xray-argo-main .cache
             rm python-xray-argo.zip
         else
             echo -e "${YELLOW}Installing unzip...${NC}"
             sudo apt-get install -y unzip
             unzip -q python-xray-argo.zip
-            mv python-xray-argo-main python-xray-argo
+            mv python-xray-argo-main .cache
             rm python-xray-argo.zip
         fi
     fi
@@ -274,71 +274,4 @@ fi
 
 SERVICE_PORT=$(grep "PORT = int" app.py | grep -o "or [0-9]*" | cut -d" " -f2)
 CURRENT_UUID=$(grep "UUID = " app.py | head -1 | cut -d"'" -f2)
-SUB_PATH_VALUE=$(grep "SUB_PATH = " app.py | cut -d"'" -f4)
-
-echo -e "${BLUE}Waiting for node information generation...${NC}"
-sleep 15
-
-NODE_INFO=""
-if [ -f ".cache/sub.txt" ]; then
-    NODE_INFO=$(cat .cache/sub.txt)
-elif [ -f "sub.txt" ]; then
-    NODE_INFO=$(cat sub.txt)
-fi
-
-echo
-echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}           Deployment Complete!         ${NC}"
-echo -e "${GREEN}========================================${NC}"
-echo
-
-echo -e "${YELLOW}=== Service Information ===${NC}"
-echo -e "Service Status: ${GREEN}Running${NC}"
-echo -e "Process PID: ${BLUE}$APP_PID${NC}"
-echo -e "Service Port: ${BLUE}$SERVICE_PORT${NC}"
-echo -e "UUID: ${BLUE}$CURRENT_UUID${NC}"
-echo -e "Subscription Path: ${BLUE}/$SUB_PATH_VALUE${NC}"
-echo
-
-echo -e "${YELLOW}=== Access URLs ===${NC}"
-if command -v curl &> /dev/null; then
-    PUBLIC_IP=$(curl -s https://api.ipify.org 2>/dev/null || echo "Failed to get")
-    if [ "$PUBLIC_IP" != "Failed to get" ]; then
-        echo -e "Subscription URL: ${GREEN}http://$PUBLIC_IP:$SERVICE_PORT/$SUB_PATH_VALUE${NC}"
-        echo -e "Admin Panel: ${GREEN}http://$PUBLIC_IP:$SERVICE_PORT${NC}"
-    fi
-fi
-echo -e "Local Subscription: ${GREEN}http://localhost:$SERVICE_PORT/$SUB_PATH_VALUE${NC}"
-echo -e "Local Admin Panel: ${GREEN}http://localhost:$SERVICE_PORT${NC}"
-echo
-
-if [ -n "$NODE_INFO" ]; then
-    echo -e "${YELLOW}=== Node Information ===${NC}"
-    DECODED_NODES=$(echo "$NODE_INFO" | base64 -d 2>/dev/null || echo "$NODE_INFO")
-    echo -e "${GREEN}Raw Node Configuration:${NC}"
-    echo "$DECODED_NODES"
-    echo
-    echo -e "${GREEN}Subscription Link (Base64 Encoded):${NC}"
-    echo "$NODE_INFO"
-    echo
-else
-    echo -e "${YELLOW}=== Node Information ===${NC}"
-    echo -e "${RED}Node information not generated yet, please wait a few minutes and check logs or manually access subscription URL${NC}"
-    echo
-fi
-
-echo -e "${YELLOW}=== Management Commands ===${NC}"
-echo -e "View logs: ${BLUE}tail -f $(pwd)/app.log${NC}"
-echo -e "Stop service: ${BLUE}kill $APP_PID${NC}"
-echo -e "Restart service: ${BLUE}kill $APP_PID && nohup python3 app.py > app.log 2>&1 &${NC}"
-echo -e "View processes: ${BLUE}ps aux | grep python3${NC}"
-echo
-
-echo -e "${YELLOW}=== Important Notes ===${NC}"
-echo -e "${GREEN}Service is running in background, please wait for Argo tunnel to establish${NC}"
-echo -e "${GREEN}If using temporary tunnel, domain will appear in logs after a few minutes${NC}"
-echo -e "${GREEN}Recommended to check subscription URL again after 10-15 minutes for latest node info${NC}"
-echo -e "${GREEN}Check logs for detailed startup process and tunnel information${NC}"
-echo
-
-echo -e "${GREEN}Deployment complete! Thank you for using!${NC}"
+SUB_PATH
